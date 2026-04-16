@@ -47,6 +47,7 @@ CREATE DATABASE dream_blanks_pos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_c
 5. Run seed SQL:
 
 - database/seeds/001_seed_base_data.sql
+- database/seeds/002_seed_demo_data.sql
 
 6. Point Apache/Nginx to project root and allow rewrite to public/index.php.
 
