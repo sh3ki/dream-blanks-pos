@@ -1,0 +1,67 @@
+<div class="card">
+    <h3 style="margin-top:0;">Record Expense</h3>
+    <form method="post" action="<?= e(url('/expenses')) ?>">
+        <?= csrf_field() ?>
+        <div class="grid grid-3">
+            <div class="field">
+                <label>Category</label>
+                <select class="select" name="expense_category_id" required>
+                    <option value="">Select Category</option>
+                    <?php foreach ($categories as $category): ?>
+                        <option value="<?= (int) $category['id'] ?>"><?= e($category['category_name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="field"><label>Description</label><input class="input" name="description" required></div>
+            <div class="field"><label>Amount</label><input class="input" type="number" step="0.01" name="amount" required></div>
+            <div class="field"><label>Payment Method</label><select class="select" name="payment_method"><option>Cash</option><option>Check</option><option>Bank Transfer</option><option>Credit Card</option></select></div>
+            <div class="field"><label>Reference #</label><input class="input" name="reference_number"></div>
+            <div class="field"><label>Expense Date</label><input class="input" type="date" name="expense_date" value="<?= date('Y-m-d') ?>"></div>
+        </div>
+        <button class="btn btn-primary" type="submit">Save Expense</button>
+    </form>
+</div>
+
+<div class="card">
+    <h3 style="margin-top:0;">Expense List</h3>
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Date</th>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($expenses as $expense): ?>
+                <?php
+                $statusClass = $expense['status'] === 'Approved' || $expense['status'] === 'Paid'
+                    ? 'status-ok'
+                    : ($expense['status'] === 'Rejected' ? 'status-out' : 'status-low');
+                ?>
+                <tr>
+                    <td><?= e($expense['expense_date']) ?></td>
+                    <td><?= e($expense['category_name']) ?></td>
+                    <td><?= e($expense['description']) ?></td>
+                    <td><?= number_format((float) $expense['amount'], 2) ?></td>
+                    <td><span class="status <?= $statusClass ?>"><?= e($expense['status']) ?></span></td>
+                    <td>
+                        <?php if ($expense['status'] === 'Pending'): ?>
+                            <form method="post" action="<?= e(url('/expenses/' . (int) $expense['id'] . '/approve')) ?>">
+                                <?= csrf_field() ?>
+                                <button class="btn btn-success" type="submit">Approve</button>
+                            </form>
+                        <?php else: ?>
+                            -
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
