@@ -1,3 +1,22 @@
+<?php
+$filterConfig = [
+    'targetTableId' => 'expenses-table',
+    'searchPlaceholder' => 'Search expenses by category or description...',
+    'searchColumns' => [1, 2],
+    'filterLabel' => 'Status',
+    'filterColumn' => 4,
+    'filterOptions' => [
+        ['value' => 'Pending', 'label' => 'Pending'],
+        ['value' => 'Approved', 'label' => 'Approved'],
+        ['value' => 'Rejected', 'label' => 'Rejected'],
+        ['value' => 'Paid', 'label' => 'Paid'],
+    ],
+    'dateColumn' => 0,
+    'emptyMessage' => 'No expenses match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
+
 <div class="card">
     <h3 style="margin-top:0;">Record Expense</h3>
     <form method="post" action="<?= e(url('/expenses')) ?>">
@@ -25,7 +44,7 @@
 <div class="card">
     <h3 style="margin-top:0;">Expense List</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="expenses-table">
             <thead>
             <tr>
                 <th>Date</th>
