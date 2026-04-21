@@ -1,3 +1,20 @@
+<?php
+$filterConfig = [
+    'targetTableId' => 'categories-table',
+    'searchPlaceholder' => 'Search categories by name or parent...',
+    'searchColumns' => [0, 1],
+    'filterLabel' => 'Status',
+    'filterColumn' => 3,
+    'filterOptions' => [
+        ['value' => 'Active', 'label' => 'Active'],
+        ['value' => 'Inactive', 'label' => 'Inactive'],
+    ],
+    'dateColumn' => '',
+    'emptyMessage' => 'No categories match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
+
 <div class="card">
     <h3 style="margin-top:0;">Create Category</h3>
     <form method="post" action="<?= e(url('/categories')) ?>">
@@ -19,7 +36,7 @@
 <div class="card">
     <h3 style="margin-top:0;">Category List</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="categories-table">
             <thead>
             <tr>
                 <th>Name</th>
