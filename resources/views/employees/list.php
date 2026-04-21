@@ -1,9 +1,24 @@
-<div class="toolbar">
-    <form method="get" action="<?= e(url('/employees')) ?>" class="flex flex-gap">
-        <input class="input" type="text" name="search" value="<?= e($search) ?>" placeholder="Search employees...">
-        <button class="btn btn-secondary" type="submit">Search</button>
-    </form>
-</div>
+<?php
+$roleOptions = [];
+foreach ($roles as $role) {
+    $roleOptions[] = [
+        'value' => (string) $role['role_name'],
+        'label' => (string) $role['role_name'],
+    ];
+}
+
+$filterConfig = [
+    'targetTableId' => 'employees-table',
+    'searchPlaceholder' => 'Search employees by ID, name, email, or department...',
+    'searchColumns' => [0, 1, 2, 3, 4],
+    'filterLabel' => 'Role',
+    'filterColumn' => 5,
+    'filterOptions' => $roleOptions,
+    'dateColumn' => '',
+    'emptyMessage' => 'No employees match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
 
 <div class="card">
     <h3 style="margin-top:0;">Add Employee</h3>
@@ -35,7 +50,7 @@
 <div class="card">
     <h3 style="margin-top:0;">Employee List</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="employees-table">
             <thead>
             <tr>
                 <th>Employee ID</th>
