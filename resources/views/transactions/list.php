@@ -1,7 +1,27 @@
+<?php
+$filterConfig = [
+    'targetTableId' => 'transactions-table',
+    'searchPlaceholder' => 'Search transactions by number or reference...',
+    'searchColumns' => [0, 4],
+    'filterLabel' => 'Transaction Type',
+    'filterColumn' => 1,
+    'filterOptions' => [
+        ['value' => 'SALE', 'label' => 'SALE'],
+        ['value' => 'EXPENSE', 'label' => 'EXPENSE'],
+        ['value' => 'PAYMENT', 'label' => 'PAYMENT'],
+        ['value' => 'REFUND', 'label' => 'REFUND'],
+        ['value' => 'ADJUSTMENT', 'label' => 'ADJUSTMENT'],
+    ],
+    'dateColumn' => 5,
+    'emptyMessage' => 'No transactions match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
+
 <div class="card">
     <h3 style="margin-top:0;">Transaction History</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="transactions-table">
             <thead>
             <tr>
                 <th>Transaction #</th>
