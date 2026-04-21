@@ -1,7 +1,24 @@
+<?php
+$filterConfig = [
+    'targetTableId' => 'notifications-table',
+    'searchPlaceholder' => 'Search notifications by type, title, or message...',
+    'searchColumns' => [0, 1, 2],
+    'filterLabel' => 'Status',
+    'filterColumn' => 3,
+    'filterOptions' => [
+        ['value' => 'Unread', 'label' => 'Unread'],
+        ['value' => 'Read', 'label' => 'Read'],
+    ],
+    'dateColumn' => 4,
+    'emptyMessage' => 'No notifications match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
+
 <div class="card">
     <h3 style="margin-top:0;">Notification Center</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="notifications-table">
             <thead>
             <tr>
                 <th>Type</th>
