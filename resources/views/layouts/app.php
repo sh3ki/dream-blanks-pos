@@ -55,10 +55,10 @@ $navItems = [
 
     <main class="main">
         <header class="topbar">
-            <div class="topbar-left">
+            <!-- <div class="topbar-left">
                 <button class="icon-btn mobile-menu-btn" data-mobile-menu type="button">☰</button>
                 <h1 class="topbar-title"><?= e($title ?? 'Dashboard') ?></h1>
-            </div>
+            </div> -->
 
             <div class="topbar-right">
                 <a href="<?= e(url('/notifications')) ?>" class="icon-btn" aria-label="Notifications">
