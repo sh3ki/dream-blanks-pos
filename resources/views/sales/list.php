@@ -1,7 +1,28 @@
+<?php
+$filterConfig = [
+    'targetTableId' => 'sales-table',
+    'searchPlaceholder' => 'Search sales by transaction, cashier, or payment method...',
+    'searchColumns' => [0, 1, 2],
+    'filterLabel' => 'Payment Method',
+    'filterColumn' => 2,
+    'filterOptions' => [
+        ['value' => 'Cash', 'label' => 'Cash'],
+        ['value' => 'Credit Card', 'label' => 'Credit Card'],
+        ['value' => 'Debit Card', 'label' => 'Debit Card'],
+        ['value' => 'Digital Wallet', 'label' => 'Digital Wallet'],
+        ['value' => 'Check', 'label' => 'Check'],
+        ['value' => 'Bank Transfer', 'label' => 'Bank Transfer'],
+    ],
+    'dateColumn' => 6,
+    'emptyMessage' => 'No sales transactions match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
+
 <div class="card">
     <h3 style="margin-top:0;">Sales Transactions</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="sales-table">
             <thead>
             <tr>
                 <th>Transaction #</th>

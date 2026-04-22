@@ -323,6 +323,31 @@ textarea {
     margin-bottom: 14px;
 }
 
+.list-filter {
+    padding-bottom: 10px;
+}
+
+.list-filter-grid {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: minmax(220px, 2fr) minmax(180px, 1.3fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(120px, auto);
+    align-items: end;
+}
+
+.list-filter-grid .field {
+    margin-bottom: 0;
+}
+
+.list-filter-field-action {
+    min-width: 120px;
+}
+
+.list-filter-empty-row td {
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
 .card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -490,6 +515,10 @@ textarea {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
+    .list-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     .pos-shell {
         grid-template-columns: 1fr;
     }
@@ -519,6 +548,10 @@ textarea {
 
     .grid-2,
     .grid-3 {
+        grid-template-columns: 1fr;
+    }
+
+    .list-filter-grid {
         grid-template-columns: 1fr;
     }
 

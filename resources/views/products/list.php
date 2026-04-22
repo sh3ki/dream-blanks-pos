@@ -1,9 +1,24 @@
-<div class="toolbar">
-    <form method="get" action="<?= e(url('/products')) ?>" class="flex flex-gap">
-        <input class="input" type="text" name="search" value="<?= e($search) ?>" placeholder="Search by name or SKU...">
-        <button class="btn btn-secondary" type="submit">Search</button>
-    </form>
-</div>
+<?php
+$categoryOptions = [];
+foreach ($categories as $category) {
+    $categoryOptions[] = [
+        'value' => (string) $category['category_name'],
+        'label' => (string) $category['category_name'],
+    ];
+}
+
+$filterConfig = [
+    'targetTableId' => 'products-table',
+    'searchPlaceholder' => 'Search products by SKU, name, or category...',
+    'searchColumns' => [0, 1, 2],
+    'filterLabel' => 'Category',
+    'filterColumn' => 2,
+    'filterOptions' => $categoryOptions,
+    'dateColumn' => '',
+    'emptyMessage' => 'No products match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
 
 <div class="card">
     <h3 style="margin-top:0;">Add Product</h3>
@@ -38,7 +53,7 @@
 <div class="card">
     <h3 style="margin-top:0;">Product List</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="products-table">
             <thead>
             <tr>
                 <th>SKU</th>

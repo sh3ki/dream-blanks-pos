@@ -1,3 +1,21 @@
+<?php
+$filterConfig = [
+    'targetTableId' => 'inventory-table',
+    'searchPlaceholder' => 'Search inventory by SKU or product...',
+    'searchColumns' => [0, 1],
+    'filterLabel' => 'Stock Status',
+    'filterColumn' => 6,
+    'filterOptions' => [
+        ['value' => 'Healthy', 'label' => 'Healthy'],
+        ['value' => 'Low', 'label' => 'Low'],
+        ['value' => 'Out', 'label' => 'Out'],
+    ],
+    'dateColumn' => '',
+    'emptyMessage' => 'No inventory records match your filters.',
+];
+require VIEW_PATH . '/components/list_filters.php';
+?>
+
 <div class="card">
     <h3 style="margin-top:0;">Stock Adjustment</h3>
     <form method="post" action="<?= e(url('/inventory/adjust')) ?>">
@@ -22,7 +40,7 @@
 <div class="card">
     <h3 style="margin-top:0;">Inventory List</h3>
     <div class="table-wrap">
-        <table class="table">
+        <table class="table" id="inventory-table">
             <thead>
             <tr>
                 <th>SKU</th>
