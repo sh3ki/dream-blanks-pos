@@ -1,3 +1,10 @@
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Dashboard</h2>
+        <p class="page-subtitle">Overview of today’s performance and quick actions.</p>
+    </div>
+</div>
+
 <div class="grid grid-3">
     <div class="card">
         <div class="kpi-label">Today's Sales</div>
@@ -21,16 +28,22 @@
     </div>
     <div class="card">
         <div class="kpi-label">Quick Actions</div>
-        <div class="flex flex-gap" style="margin-top:10px;flex-wrap:wrap;">
-            <a class="btn btn-primary" href="<?= e(url('/pos')) ?>">New Sale</a>
-            <a class="btn btn-secondary" href="<?= e(url('/products')) ?>">Add Product</a>
-            <a class="btn btn-secondary" href="<?= e(url('/expenses')) ?>">Record Expense</a>
+        <div class="flex flex-gap quick-actions">
+            <?php if (has_permission('sales.process')): ?>
+                <a class="btn btn-primary" href="<?= e(url('/pos')) ?>">New Sale</a>
+            <?php endif; ?>
+            <?php if (has_any_permission(['products.create', 'products.manage'])): ?>
+                <a class="btn btn-secondary" href="<?= e(url('/products')) ?>">Add Product</a>
+            <?php endif; ?>
+            <?php if (has_any_permission(['expenses.create', 'expenses.manage'])): ?>
+                <a class="btn btn-secondary" href="<?= e(url('/expenses')) ?>">Record Expense</a>
+            <?php endif; ?>
         </div>
     </div>
 </div>
 
 <div class="card">
-    <h3 style="margin-top:0;">Recent Sales</h3>
+    <h3 class="card-title">Recent Sales</h3>
     <div class="table-wrap">
         <table class="table">
             <thead>
