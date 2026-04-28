@@ -7,8 +7,28 @@ class Controller
     protected function authorize(array $roles): void
     {
         if (!Auth::check() || !Auth::hasRole($roles)) {
-            http_response_code(403);
-            exit('Forbidden');
+            $this->denyForbidden();
+        }
+    }
+
+    protected function authorizePermission(string $permission): void
+    {
+        if (!Auth::check() || !Auth::hasPermission($permission)) {
+            $this->denyForbidden();
+        }
+    }
+
+    protected function authorizeAnyPermission(array $permissions): void
+    {
+        if (!Auth::check() || !Auth::hasAnyPermission($permissions)) {
+            $this->denyForbidden();
+        }
+    }
+
+    protected function authorizeAllPermissions(array $permissions): void
+    {
+        if (!Auth::check() || !Auth::hasAllPermissions($permissions)) {
+            $this->denyForbidden();
         }
     }
 
@@ -25,5 +45,11 @@ class Controller
     protected function redirect(string $path): void
     {
         Response::redirect($path);
+    }
+
+    private function denyForbidden(): void
+    {
+        http_response_code(403);
+        exit('Forbidden');
     }
 }
