@@ -13,34 +13,55 @@ $filterConfig = [
     'dateColumn' => '',
     'emptyMessage' => 'No inventory records match your filters.',
 ];
-require VIEW_PATH . '/components/list_filters.php';
 ?>
 
-<div class="card">
-    <h3 style="margin-top:0;">Stock Adjustment</h3>
-    <form method="post" action="<?= e(url('/inventory/adjust')) ?>">
-        <?= csrf_field() ?>
-        <div class="grid grid-3">
-            <div class="field">
-                <label>Product</label>
-                <select class="select" name="product_id" required>
-                    <option value="">Select Product</option>
-                    <?php foreach ($items as $item): ?>
-                        <option value="<?= (int) $item['product_id'] ?>"><?= e($item['sku'] . ' - ' . $item['product_name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="field"><label>New Quantity</label><input class="input" type="number" name="new_quantity" required></div>
-            <div class="field"><label>Reason</label><input class="input" name="reason" placeholder="Damage, audit, correction..." required></div>
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Inventory</h2>
+        <p class="page-subtitle">Track stock levels, reservations, and reorder health.</p>
+    </div>
+    <div class="page-actions">
+        <button class="btn btn-warning" type="button" data-modal-open="inventory-adjust-modal">Adjust Stock</button>
+    </div>
+</div>
+
+<?php require VIEW_PATH . '/components/list_filters.php'; ?>
+
+<div class="modal" id="inventory-adjust-modal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <strong>Stock Adjustment</strong>
+            <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
         </div>
-        <button class="btn btn-warning" type="submit">Adjust Stock</button>
-    </form>
+        <div class="modal-body">
+            <form method="post" action="<?= e(url('/inventory/adjust')) ?>" id="inventory-adjust-form">
+                <?= csrf_field() ?>
+                <div class="grid grid-3">
+                    <div class="field">
+                        <label>Product</label>
+                        <select class="select" name="product_id" required>
+                            <option value="">Select Product</option>
+                            <?php foreach ($items as $item): ?>
+                                <option value="<?= (int) $item['product_id'] ?>"><?= e($item['sku'] . ' - ' . $item['product_name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="field"><label>New Quantity</label><input class="input" type="number" name="new_quantity" required></div>
+                    <div class="field"><label>Reason</label><input class="input" name="reason" placeholder="Damage, audit, correction..." required></div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" type="button" data-modal-close>Cancel</button>
+            <button class="btn btn-warning" type="submit" form="inventory-adjust-form">Adjust Stock</button>
+        </div>
+    </div>
 </div>
 
 <div class="card">
-    <h3 style="margin-top:0;">Inventory List</h3>
+    <h3 class="card-title">Inventory List</h3>
     <div class="table-wrap">
-        <table class="table" id="inventory-table">
+        <table class="table" id="inventory-table" data-table>
             <thead>
             <tr>
                 <th>SKU</th>
@@ -72,5 +93,19 @@ require VIEW_PATH . '/components/list_filters.php';
             <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
+
+    <div class="table-pagination" data-table-pagination data-target-table="inventory-table">
+        <div data-table-page-info></div>
+        <div class="pagination">
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-first>First</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-prev>Prev</button>
+            <div class="page-jump">
+                <input class="input input-sm" type="number" min="1" data-table-page-input>
+                <span class="page-total" data-table-page-total></span>
+            </div>
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-next>Next</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-last>Last</button>
+        </div>
     </div>
 </div>
