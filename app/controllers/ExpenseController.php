@@ -11,7 +11,7 @@ class ExpenseController extends Controller
 {
     public function index(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Accountant']);
+        $this->authorizeAnyPermission(['expenses.view', 'expenses.manage']);
 
         $pdo = Database::connection();
         $expenses = $pdo->query(
@@ -35,7 +35,7 @@ class ExpenseController extends Controller
 
     public function store(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Accountant']);
+        $this->authorizeAnyPermission(['expenses.create', 'expenses.manage']);
 
         $categoryId = (int) $request->input('expense_category_id');
         $description = trim((string) $request->input('description'));
@@ -68,7 +68,7 @@ class ExpenseController extends Controller
 
     public function approve(Request $request, array $params): void
     {
-        $this->authorize(['Admin', 'Manager']);
+        $this->authorizeAnyPermission(['expenses.approve', 'expenses.manage']);
         $expenseId = (int) ($params['id'] ?? 0);
 
         $pdo = Database::connection();
@@ -84,6 +84,60 @@ class ExpenseController extends Controller
         ]);
 
         flash('success', 'Expense approved.');
+        $this->redirect('/expenses');
+    }
+
+    public function reject(Request $request, array $params): void
+    {
+        $this->authorizeAnyPermission(['expenses.approve', 'expenses.manage']);
+        $expenseId = (int) ($params['id'] ?? 0);
+
+        if ($expenseId < 1) {
+            flash('error', 'Invalid expense target.');
+            $this->redirect('/expenses');
+        }
+
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare(
+            'UPDATE expenses
+             SET approver_id = :approver_id, status = :status, approval_date = NOW(), updated_at = NOW()
+             WHERE id = :id'
+        );
+        $stmt->execute([
+            'approver_id' => (int) Auth::id(),
+            'status' => 'Rejected',
+            'id' => $expenseId,
+        ]);
+
+        log_activity('expense.rejected', ['expense_id' => $expenseId]);
+        flash('success', 'Expense rejected.');
+        $this->redirect('/expenses');
+    }
+
+    public function markPaid(Request $request, array $params): void
+    {
+        $this->authorizeAnyPermission(['expenses.approve', 'expenses.manage']);
+        $expenseId = (int) ($params['id'] ?? 0);
+
+        if ($expenseId < 1) {
+            flash('error', 'Invalid expense target.');
+            $this->redirect('/expenses');
+        }
+
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare(
+            'UPDATE expenses
+             SET approver_id = :approver_id, status = :status, updated_at = NOW()
+             WHERE id = :id'
+        );
+        $stmt->execute([
+            'approver_id' => (int) Auth::id(),
+            'status' => 'Paid',
+            'id' => $expenseId,
+        ]);
+
+        log_activity('expense.paid', ['expense_id' => $expenseId]);
+        flash('success', 'Expense marked as paid.');
         $this->redirect('/expenses');
     }
 }
