@@ -10,7 +10,7 @@ class DashboardController extends Controller
 {
     public function index(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier', 'Store Staff', 'Accountant']);
+        $this->authorizePermission('dashboard.view');
 
         $service = new DashboardService();
         $summary = $service->summary();
