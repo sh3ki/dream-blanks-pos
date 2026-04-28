@@ -11,7 +11,7 @@ class NotificationController extends Controller
 {
     public function index(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier', 'Store Staff', 'Accountant']);
+        $this->authorizePermission('notifications.view');
 
         $pdo = Database::connection();
         $stmt = $pdo->prepare('SELECT * FROM notifications WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 100');
@@ -26,7 +26,7 @@ class NotificationController extends Controller
 
     public function markRead(Request $request, array $params): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier', 'Store Staff', 'Accountant']);
+        $this->authorizePermission('notifications.view');
         $id = (int) ($params['id'] ?? 0);
 
         $pdo = Database::connection();
