@@ -40,15 +40,14 @@ document.addEventListener('DOMContentLoaded', () => {
             subtotal += lineTotal;
 
             const row = document.createElement('div');
-            row.className = 'flex justify-between align-center';
-            row.style.padding = '8px 0';
+            row.className = 'cart-item';
 
             row.innerHTML = `
-                <div>
+                <div class="cart-item-info">
                     <strong>${item.product_name}</strong><br>
                     <small>Qty: ${item.quantity} x ${item.unit_price.toFixed(2)}</small>
                 </div>
-                <div class="flex flex-gap align-center">
+                <div class="cart-item-actions">
                     <button type="button" class="btn btn-secondary" data-dec="${index}">-</button>
                     <button type="button" class="btn btn-secondary" data-inc="${index}">+</button>
                     <button type="button" class="btn btn-danger" data-remove="${index}">x</button>
