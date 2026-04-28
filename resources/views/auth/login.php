@@ -19,9 +19,9 @@
         <input id="password" class="input" type="password" name="password" required>
     </div>
 
-    <div class="field" style="display:flex;justify-content:space-between;align-items:center;">
-        <label style="margin:0;"><input type="checkbox" name="remember_me" value="1"> Remember me</label>
-        <a href="#" style="color:#4b5563;font-size:13px;">Forgot password?</a>
+    <div class="field auth-options">
+        <label class="inline-label"><input type="checkbox" name="remember_me" value="1"> Remember me</label>
+        <a class="auth-link" href="#">Forgot password?</a>
     </div>
 
     <button class="btn btn-primary w-full" type="submit">Login</button>
