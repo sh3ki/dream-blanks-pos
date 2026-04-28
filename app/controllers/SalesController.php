@@ -12,7 +12,7 @@ class SalesController extends Controller
 {
     public function pos(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier']);
+        $this->authorizePermission('sales.process');
 
         $pdo = Database::connection();
         $products = $pdo->query(
@@ -37,7 +37,7 @@ class SalesController extends Controller
 
     public function store(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier']);
+        $this->authorizePermission('sales.process');
 
         $items = json_decode((string) $request->input('items_json', '[]'), true);
         if (!is_array($items) || count($items) === 0) {
@@ -69,20 +69,40 @@ class SalesController extends Controller
 
     public function index(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier', 'Accountant']);
+        $this->authorizePermission('sales.view');
 
         $pdo = Database::connection();
-        $sales = $pdo->query(
-            'SELECT s.*, CONCAT(u.first_name, " ", u.last_name) AS cashier_name
-             FROM sales s
-             INNER JOIN users u ON u.id = s.cashier_id
-             ORDER BY s.created_at DESC
-             LIMIT 200'
-        )->fetchAll();
+            $page = max(1, (int) $request->input('page', 1));
+            $perPage = 20;
+            $offset = ($page - 1) * $perPage;
+
+            $countRow = $pdo->query('SELECT COUNT(*) AS total FROM sales')->fetch();
+            $total = (int) ($countRow['total'] ?? 0);
+            $totalPages = max(1, (int) ceil($total / $perPage));
+            if ($page > $totalPages) {
+                $page = $totalPages;
+                $offset = ($page - 1) * $perPage;
+            }
+
+            $stmt = $pdo->prepare(
+                'SELECT s.*, CONCAT(u.first_name, " ", u.last_name) AS cashier_name
+                 FROM sales s
+                 INNER JOIN users u ON u.id = s.cashier_id
+                 ORDER BY s.created_at DESC
+                 LIMIT :limit OFFSET :offset'
+            );
+            $stmt->bindValue(':limit', $perPage, \PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, \PDO::PARAM_INT);
+            $stmt->execute();
+            $sales = $stmt->fetchAll();
 
         $this->render('sales.list', [
             'title' => 'Sales',
             'sales' => $sales,
+                'page' => $page,
+                'perPage' => $perPage,
+                'total' => $total,
+                'totalPages' => $totalPages,
             'flash' => consume_flash(),
         ]);
     }
