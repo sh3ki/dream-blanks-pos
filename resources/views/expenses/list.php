@@ -1,4 +1,7 @@
 <?php
+$canCreateExpense = has_any_permission(['expenses.create', 'expenses.manage']);
+$canApproveExpense = has_any_permission(['expenses.approve', 'expenses.manage']);
+
 $filterConfig = [
     'targetTableId' => 'expenses-table',
     'searchPlaceholder' => 'Search expenses by category or description...',
@@ -14,37 +17,62 @@ $filterConfig = [
     'dateColumn' => 0,
     'emptyMessage' => 'No expenses match your filters.',
 ];
-require VIEW_PATH . '/components/list_filters.php';
 ?>
 
-<div class="card">
-    <h3 style="margin-top:0;">Record Expense</h3>
-    <form method="post" action="<?= e(url('/expenses')) ?>">
-        <?= csrf_field() ?>
-        <div class="grid grid-3">
-            <div class="field">
-                <label>Category</label>
-                <select class="select" name="expense_category_id" required>
-                    <option value="">Select Category</option>
-                    <?php foreach ($categories as $category): ?>
-                        <option value="<?= (int) $category['id'] ?>"><?= e($category['category_name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            <div class="field"><label>Description</label><input class="input" name="description" required></div>
-            <div class="field"><label>Amount</label><input class="input" type="number" step="0.01" name="amount" required></div>
-            <div class="field"><label>Payment Method</label><select class="select" name="payment_method"><option>Cash</option><option>Check</option><option>Bank Transfer</option><option>Credit Card</option></select></div>
-            <div class="field"><label>Reference #</label><input class="input" name="reference_number"></div>
-            <div class="field"><label>Expense Date</label><input class="input" type="date" name="expense_date" value="<?= date('Y-m-d') ?>"></div>
-        </div>
-        <button class="btn btn-primary" type="submit">Save Expense</button>
-    </form>
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Expenses</h2>
+        <p class="page-subtitle">Record, approve, and track operational spending.</p>
+    </div>
+    <div class="page-actions">
+        <?php if ($canCreateExpense): ?>
+            <button class="btn btn-primary" type="button" data-modal-open="expense-create-modal">Record Expense</button>
+        <?php endif; ?>
+    </div>
 </div>
 
+<?php require VIEW_PATH . '/components/list_filters.php'; ?>
+
+<?php if ($canCreateExpense): ?>
+<div class="modal" id="expense-create-modal">
+    <div class="modal-card modal-lg">
+        <div class="modal-header">
+            <strong>Record Expense</strong>
+            <button class="modal-close" type="button" data-modal-close aria-label="Close">&times;</button>
+        </div>
+        <div class="modal-body">
+            <form method="post" action="<?= e(url('/expenses')) ?>" id="expense-create-form">
+                <?= csrf_field() ?>
+                <div class="grid grid-3">
+                    <div class="field">
+                        <label>Category</label>
+                        <select class="select" name="expense_category_id" required>
+                            <option value="">Select Category</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?= (int) $category['id'] ?>"><?= e($category['category_name']) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="field"><label>Description</label><input class="input" name="description" required></div>
+                    <div class="field"><label>Amount</label><input class="input" type="number" step="0.01" name="amount" required></div>
+                    <div class="field"><label>Payment Method</label><select class="select" name="payment_method"><option>Cash</option><option>Check</option><option>Bank Transfer</option><option>Credit Card</option></select></div>
+                    <div class="field"><label>Reference #</label><input class="input" name="reference_number"></div>
+                    <div class="field"><label>Expense Date</label><input class="input" type="date" name="expense_date" value="<?= date('Y-m-d') ?>"></div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-ghost" type="button" data-modal-close>Cancel</button>
+            <button class="btn btn-primary" type="submit" form="expense-create-form">Save Expense</button>
+        </div>
+    </div>
+</div>
+<?php endif; ?>
+
 <div class="card">
-    <h3 style="margin-top:0;">Expense List</h3>
+    <h3 class="card-title">Expense List</h3>
     <div class="table-wrap">
-        <table class="table" id="expenses-table">
+        <table class="table" id="expenses-table" data-table>
             <thead>
             <tr>
                 <th>Date</th>
@@ -52,7 +80,7 @@ require VIEW_PATH . '/components/list_filters.php';
                 <th>Description</th>
                 <th>Amount</th>
                 <th>Status</th>
-                <th>Action</th>
+                <th data-no-sort>Action</th>
             </tr>
             </thead>
             <tbody>
@@ -69,11 +97,30 @@ require VIEW_PATH . '/components/list_filters.php';
                     <td><?= number_format((float) $expense['amount'], 2) ?></td>
                     <td><span class="status <?= $statusClass ?>"><?= e($expense['status']) ?></span></td>
                     <td>
-                        <?php if ($expense['status'] === 'Pending'): ?>
-                            <form method="post" action="<?= e(url('/expenses/' . (int) $expense['id'] . '/approve')) ?>">
-                                <?= csrf_field() ?>
-                                <button class="btn btn-success" type="submit">Approve</button>
-                            </form>
+                        <?php if ($canApproveExpense && $expense['status'] === 'Pending'): ?>
+                            <div class="action-menu" data-menu>
+                                <button class="btn btn-ghost btn-sm" type="button" data-menu-toggle>Actions</button>
+                                <div class="menu" data-menu-list>
+                                    <form method="post" action="<?= e(url('/expenses/' . (int) $expense['id'] . '/approve')) ?>">
+                                        <?= csrf_field() ?>
+                                        <button type="submit">Approve</button>
+                                    </form>
+                                    <form method="post" action="<?= e(url('/expenses/' . (int) $expense['id'] . '/reject')) ?>" data-confirm="Reject this expense?">
+                                        <?= csrf_field() ?>
+                                        <button type="submit">Reject</button>
+                                    </form>
+                                </div>
+                            </div>
+                        <?php elseif ($canApproveExpense && $expense['status'] === 'Approved'): ?>
+                            <div class="action-menu" data-menu>
+                                <button class="btn btn-ghost btn-sm" type="button" data-menu-toggle>Actions</button>
+                                <div class="menu" data-menu-list>
+                                    <form method="post" action="<?= e(url('/expenses/' . (int) $expense['id'] . '/paid')) ?>">
+                                        <?= csrf_field() ?>
+                                        <button type="submit">Mark Paid</button>
+                                    </form>
+                                </div>
+                            </div>
                         <?php else: ?>
                             -
                         <?php endif; ?>
@@ -82,5 +129,19 @@ require VIEW_PATH . '/components/list_filters.php';
             <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
+
+    <div class="table-pagination" data-table-pagination data-target-table="expenses-table">
+        <div data-table-page-info></div>
+        <div class="pagination">
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-first>First</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-prev>Prev</button>
+            <div class="page-jump">
+                <input class="input input-sm" type="number" min="1" data-table-page-input>
+                <span class="page-total" data-table-page-total></span>
+            </div>
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-next>Next</button>
+            <button class="btn btn-ghost btn-sm" type="button" data-table-page-last>Last</button>
+        </div>
     </div>
 </div>
