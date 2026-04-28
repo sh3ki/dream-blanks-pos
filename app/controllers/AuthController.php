@@ -49,7 +49,6 @@ class AuthController extends Controller
 
     public function profile(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier', 'Store Staff', 'Accountant']);
         $this->render('auth.profile', [
             'title' => 'Profile Settings',
             'user' => Auth::user(),
@@ -59,12 +58,19 @@ class AuthController extends Controller
 
     public function updateProfile(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Cashier', 'Store Staff', 'Accountant']);
         $user = Auth::user();
 
         $firstName = trim((string) $request->input('first_name'));
         $lastName = trim((string) $request->input('last_name'));
         $email = trim((string) $request->input('email'));
+
+        $photoPath = null;
+        try {
+            $photoPath = store_uploaded_image('avatar', 'employees');
+        } catch (\Throwable $e) {
+            flash('error', $e->getMessage());
+            $this->redirect('/profile');
+        }
 
         if ($firstName === '' || $lastName === '' || $email === '') {
             flash('error', 'First name, last name, and email are required.');
@@ -72,13 +78,31 @@ class AuthController extends Controller
         }
 
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, updated_at = NOW() WHERE id = :id');
-        $stmt->execute([
-            'first_name' => $firstName,
-            'last_name' => $lastName,
-            'email' => $email,
-            'id' => $user['id'],
-        ]);
+        $pdo->beginTransaction();
+
+        try {
+            $stmt = $pdo->prepare('UPDATE users SET first_name = :first_name, last_name = :last_name, email = :email, updated_at = NOW() WHERE id = :id');
+            $stmt->execute([
+                'first_name' => $firstName,
+                'last_name' => $lastName,
+                'email' => $email,
+                'id' => $user['id'],
+            ]);
+
+            if ($photoPath !== null) {
+                $photoStmt = $pdo->prepare('UPDATE employees SET photo_path = :photo_path, updated_at = NOW() WHERE user_id = :user_id');
+                $photoStmt->execute([
+                    'photo_path' => $photoPath,
+                    'user_id' => $user['id'],
+                ]);
+            }
+
+            $pdo->commit();
+        } catch (\Throwable $e) {
+            $pdo->rollBack();
+            flash('error', 'Unable to update profile: ' . $e->getMessage());
+            $this->redirect('/profile');
+        }
 
         $_SESSION['user']['name'] = $firstName . ' ' . $lastName;
         $_SESSION['user']['first_name'] = $firstName;
