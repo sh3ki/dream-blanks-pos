@@ -82,8 +82,8 @@ class AuthService
             $userId = (int) $pdo->lastInsertId();
 
             $employeeStmt = $pdo->prepare(
-                'INSERT INTO employees (employee_id, first_name, last_name, email, phone, department, position, hire_date, is_active, user_id, created_at, updated_at)
-                 VALUES (:employee_id, :first_name, :last_name, :email, :phone, :department, :position, :hire_date, 1, :user_id, NOW(), NOW())'
+                'INSERT INTO employees (employee_id, first_name, last_name, email, phone, department, position, hire_date, photo_path, is_active, user_id, created_at, updated_at)
+                 VALUES (:employee_id, :first_name, :last_name, :email, :phone, :department, :position, :hire_date, :photo_path, 1, :user_id, NOW(), NOW())'
             );
             $employeeStmt->execute([
                 'employee_id' => $employeeData['employee_id'],
@@ -94,6 +94,7 @@ class AuthService
                 'department' => $employeeData['department'] ?? null,
                 'position' => $employeeData['position'] ?? null,
                 'hire_date' => $employeeData['hire_date'] ?? date('Y-m-d'),
+                'photo_path' => $employeeData['photo_path'] ?? null,
                 'user_id' => $userId,
             ]);
 
