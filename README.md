@@ -43,6 +43,7 @@ CREATE DATABASE dream_blanks_pos CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_c
 4. Run migration SQL:
 
 - database/migrations/001_initial_schema.sql
+- database/migrations/002_permissions_upgrade.sql
 
 5. Run seed SQL:
 
