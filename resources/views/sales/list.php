@@ -15,14 +15,23 @@ $filterConfig = [
     ],
     'dateColumn' => 6,
     'emptyMessage' => 'No sales transactions match your filters.',
+    'enableClientPaging' => false,
 ];
-require VIEW_PATH . '/components/list_filters.php';
 ?>
 
+<div class="page-header">
+    <div>
+        <h2 class="page-title">Sales</h2>
+        <p class="page-subtitle">Review transaction activity and payment mix.</p>
+    </div>
+</div>
+
+<?php require VIEW_PATH . '/components/list_filters.php'; ?>
+
 <div class="card">
-    <h3 style="margin-top:0;">Sales Transactions</h3>
+    <h3 class="card-title">Sales Transactions</h3>
     <div class="table-wrap">
-        <table class="table" id="sales-table">
+        <table class="table" id="sales-table" data-table>
             <thead>
             <tr>
                 <th>Transaction #</th>
@@ -49,4 +58,25 @@ require VIEW_PATH . '/components/list_filters.php';
             </tbody>
         </table>
     </div>
+
+    <?php if (($totalPages ?? 1) > 1): ?>
+        <?php
+        $prevPage = max(1, ((int) ($page ?? 1)) - 1);
+        $nextPage = min((int) ($totalPages ?? 1), ((int) ($page ?? 1)) + 1);
+        $lastPage = (int) ($totalPages ?? 1);
+        ?>
+        <div class="table-pagination">
+            <div>Page <?= (int) ($page ?? 1) ?> of <?= (int) ($totalPages ?? 1) ?> (<?= (int) ($total ?? 0) ?> records)</div>
+            <div class="pagination">
+                <a class="btn btn-ghost btn-sm <?= (int) ($page ?? 1) <= 1 ? 'hidden' : '' ?>" href="<?= e(url('/sales?page=1')) ?>">First</a>
+                <a class="btn btn-ghost btn-sm <?= (int) ($page ?? 1) <= 1 ? 'hidden' : '' ?>" href="<?= e(url('/sales?page=' . $prevPage)) ?>">Prev</a>
+                <form class="page-jump" method="get" action="<?= e(url('/sales')) ?>">
+                    <input class="input input-sm" type="number" min="1" max="<?= (int) ($totalPages ?? 1) ?>" name="page" value="<?= (int) ($page ?? 1) ?>">
+                    <span class="page-total">of <?= (int) ($totalPages ?? 1) ?></span>
+                </form>
+                <a class="btn btn-ghost btn-sm <?= (int) ($page ?? 1) >= (int) ($totalPages ?? 1) ? 'hidden' : '' ?>" href="<?= e(url('/sales?page=' . $nextPage)) ?>">Next</a>
+                <a class="btn btn-ghost btn-sm <?= (int) ($page ?? 1) >= (int) ($totalPages ?? 1) ? 'hidden' : '' ?>" href="<?= e(url('/sales?page=' . $lastPage)) ?>">Last</a>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
