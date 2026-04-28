@@ -12,7 +12,7 @@ class InventoryController extends Controller
 {
     public function index(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Store Staff', 'Cashier']);
+        $this->authorizePermission('inventory.view');
 
         $pdo = Database::connection();
         $items = $pdo->query(
@@ -33,7 +33,7 @@ class InventoryController extends Controller
 
     public function adjust(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Store Staff']);
+        $this->authorizePermission('inventory.adjust');
 
         $productId = (int) $request->input('product_id');
         $newQty = (int) $request->input('new_quantity');
@@ -53,7 +53,7 @@ class InventoryController extends Controller
 
     public function lowStock(Request $request): void
     {
-        $this->authorize(['Admin', 'Manager', 'Store Staff']);
+        $this->authorizePermission('inventory.view');
         $service = new InventoryService();
 
         $this->json([
