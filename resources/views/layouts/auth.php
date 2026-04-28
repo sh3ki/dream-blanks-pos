@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($title ?? 'Authentication') ?> - Dream Blanks POS</title>
     <link rel="stylesheet" href="<?= e(asset_url('css/style.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset_url('css/responsive.css')) ?>">
 </head>
 <body>
 <div class="auth-shell">
